@@ -107,14 +107,26 @@ def plot_data(data, name, style, axes):
 
 
 if __name__ == "__main__":
+
     N = 100
-    POLY_PARAM_NUM = 10
-    RBF_PARAM_NUM = 30
-    NOISE = {"loc":0.0, "scale":0.1}
+
+    # lenear regression
+    NOISE = {"loc":0.0, "scale":0.3}
+    plt.figure()
+    lin_ax = plt.subplot(1, 1, 1)
+    noise_data = make_linear_data(N, noise=NOISE)
+    fitted_by_lenear = linear_regression(noise_data)
+    plot_data(fitted_by_lenear, 'fitted by lenear', 'r-', lin_ax)
+    plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', lin_ax)
+    
 
     # nonlenear regression
 
     # setup some data
+    NOISE = {"loc":0.0, "scale":0.1}
+    POLY_PARAM_NUM = 10
+    RBF_PARAM_NUM = 30
+
     plt.figure()
     poly_ax = plt.subplot(2, 2, 1)
     poly_reg_ax = plt.subplot(2, 2, 2)
