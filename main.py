@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-axes = plt.subplot(1, 1, 1)
 
 def make_linear_data(n, a=1, b=0, noise={"loc":0.0, "scale":0.1}):
     func = lambda x: a*x + b
@@ -94,7 +93,7 @@ def nonlenear_regression(data, basis_func, param, plot=False):
     if plot:
         for j in range(param):
             df = pd.DataFrame(pd.Series(W[j]*phi_x[:, j], index=x))
-            df.plot(color='k', legend=None, ax=axes, style="--")
+            df.plot(color='k', legend=None, ax=plot["axes"], style="--")
 
     data = pd.Series(Y, index=data.index)
 
@@ -110,17 +109,18 @@ if __name__ == "__main__":
     N = 100
     POLY_PARAM_NUM = 3
     RBF_PARAM_NUM = 10
-    NOISE = {"loc":0.0, "scale":0.3}
-    PLOT = False
+    NOISE = {"loc":0.0, "scale":0.1}
+    axes = plt.subplot(1, 1, 1)
+    PLOT = {"axes": axes}
 
     # nonlenear regression
     noise_data = make_sin_data(N, noise=NOISE)
-    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, plot=PLOT)
-    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=PLOT)
+    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, plot=False)
+    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
 
     # plotting fitted and noisy data
-    plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', axes)
     plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', axes)
     plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', axes)
+    plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', axes)
 
     plt.show()
