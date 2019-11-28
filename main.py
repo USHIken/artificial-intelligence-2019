@@ -101,24 +101,26 @@ def nonlenear_regression(data, basis_func, param, plot=False):
     return data
 
 
+def plot_data(data, name, style, axes):
+    df = pd.DataFrame({name: data})
+    df.plot.line(style=style, ax=axes)
+
+
 if __name__ == "__main__":
     N = 100
     POLY_PARAM_NUM = 3
     RBF_PARAM_NUM = 10
     NOISE = {"loc":0.0, "scale":0.3}
-    PLOT = True
+    PLOT = False
 
     # nonlenear regression
     noise_data = make_sin_data(N, noise=NOISE)
-    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, PLOT)
-    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, PLOT)
+    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, plot=PLOT)
+    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=PLOT)
 
     # plotting fitted and noisy data
-    series_dict = {}
-    series_dict['noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"])] = noise_data
-    series_dict['fitted by poly (M={})'.format(POLY_PARAM_NUM)] = fitted_by_poly
-    series_dict['fitted by rbf (M={})'.format(RBF_PARAM_NUM)] = fitted_by_rbf
+    plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', axes)
+    plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', axes)
+    plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', axes)
 
-    df = pd.DataFrame(series_dict)
-    df.plot.line(style=['g.', 'r-', 'b-'], ax=axes, title="data")
     plt.show()
