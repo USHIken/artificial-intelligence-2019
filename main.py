@@ -11,7 +11,7 @@ def make_linear_data(n, a=1, b=0, noise=True):
 
 def make_sin_data(n, noise=True):
     func = np.sin
-    data = make_data(100, func, -1*np.pi, 1*np.pi, noise)
+    data = make_data(n, func, -1*np.pi, 1*np.pi, noise)
     return data
 
 
@@ -47,14 +47,14 @@ def nonlenear_regression(data, param):
     N = data.shape[0]
     x = data.index
     y = data.values
-
-    phi_x = np.zeros((N, param))
+    phi_x = np.zeros((N, param+1))
     Y = np.zeros(N)
-    for j in range(param):
+
+    for j in range(param+1):
         phi_x[:,j] = pow(x, j)
     phi_x_t = phi_x.T
     W = np.dot(np.dot(np.linalg.inv(np.dot(phi_x_t, phi_x)), phi_x_t), y)
-    for j in range(param):
+    for j in range(param+1):
         Y += W[j] * pow(x, j)
 
     data = pd.Series(Y, index=x)
@@ -71,7 +71,5 @@ if __name__ == "__main__":
     data = nonlenear_regression(noise_data, 3)
 
     df = pd.DataFrame({'fitted': data, 'noise': noise_data})
-
-    plt.figure()
     df.plot(color=('r', 'b'))
     plt.show()
