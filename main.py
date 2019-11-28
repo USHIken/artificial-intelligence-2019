@@ -108,26 +108,38 @@ def plot_data(data, name, style, axes):
 
 if __name__ == "__main__":
     N = 100
-    POLY_PARAM_NUM = 3
-    RBF_PARAM_NUM = 10
+    POLY_PARAM_NUM = 10
+    RBF_PARAM_NUM = 30
     NOISE = {"loc":0.0, "scale":0.1}
 
     # nonlenear regression
 
     # setup some data
     plt.figure()
-    axes = plt.subplot(1, 1, 1)
+    poly_ax = plt.subplot(2, 2, 1)
+    poly_reg_ax = plt.subplot(2, 2, 2)
+    rbf_ax = plt.subplot(2, 2, 3)
+    rbf_reg_ax = plt.subplot(2, 2, 4)
+    axes = [poly_ax, poly_reg_ax, rbf_ax, rbf_reg_ax]
+
     noise_data = make_sin_data(N, noise=NOISE)
     regularizer_lambda = np.exp(-18)
 
-    # polynomial
-    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=False)
-    plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', axes)
+    # polynomial without regularization
+    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, 0, plot=poly_ax)
+    plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_ax)
+    # polynomial without regularization
+    fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=poly_reg_ax)
+    plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_reg_ax)
 
-    # rbf
-    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
-    plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', axes)
+    # rbf without regularization
+    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, 0, plot=rbf_ax)
+    plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_ax)
+    # rbf without regularization
+    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=rbf_reg_ax)
+    plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_reg_ax)
 
     # plotting noisy data
-    plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', axes)
+    for ax in axes:
+        plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', ax)
     plt.show()
