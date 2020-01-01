@@ -58,16 +58,24 @@ class MultilayerPerceptron(object):
 
                 # 順伝搬
                 z_in, z_out, y_in, y_out = self._forward(X_train[idx])
+                if y_out[0][0] == np.nan: exit(0)
                 print("y_train, y_out = {}, {}".format(y_train[idx], y_out))
 
                 # 逆伝搬
-                sigma_out = y_out - y_train[idx]
-                delta_w_2 = np.dot(z_out.T, sigma_out)
+                sigma_1 = y_out - y_train[idx]
+                delta_w_2 = np.dot(z_out.T, sigma_1)
+                delta_b_2 = np.sum(sigma_1, axis=0)
                 self.w_2 += self.eta * delta_w_2
-                delta_w_1 = np.dot(sigma_out, self.w_2.T) * np.dot(self._tanh_derivate(z_in), X_train[idx])
+                self.b_2 += self.eta * delta_b_2
+
+                sigma_2 = np.dot(sigma_1, self.w_2.T) * self._tanh_derivate(z_in)
+                delta_w_1 = np.dot(sigma_2, X_train[idx])
+                delta_b_1 = np.sum(sigma_2, axis=0)
                 self.w_1 += self.eta * delta_w_1
-            print("w_1", self.w_1)
-            print("w_2", self.w_2)
+                self.b_1 += self.eta * delta_b_1
+
+                print("w_1", self.w_1)
+                print("w_2", self.w_2)
         return self
     
     def predict(self, X):
@@ -80,7 +88,7 @@ def util_mlp():
     N = 1000
     train = make_sin_data(N)
     test = make_sin_data(N)
-    mlp = MultilayerPerceptron(epochs=1)
+    mlp = MultilayerPerceptron(epochs=1, eta=0.5)
     mlp.fit(train.index, train.values)
     valid_y = mlp.predict(np.array([test.index]).T)
     valid = pd.Series(valid_y, index=test.index)
