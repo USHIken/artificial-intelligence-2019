@@ -58,40 +58,44 @@ class MultilayerPerceptron(object):
 
                 # 順伝搬
                 z_in, z_out, y_in, y_out = self._forward(X_train[idx])
-                if y_out[0][0] == np.nan: exit(0)
-                print("y_train, y_out = {}, {}".format(y_train[idx], y_out))
+                if np.isnan(y_out[0][0]): exit(0)
+                # print("y_train, x_in, y_out = {}, {}, {}".format(y_train[idx], X_train[idx], y_out))
 
                 # 逆伝搬
-                sigma_1 = y_out - y_train[idx]
-                delta_w_2 = np.dot(z_out.T, sigma_1)
-                delta_b_2 = np.sum(sigma_1, axis=0)
-                self.w_2 += self.eta * delta_w_2
-                self.b_2 += self.eta * delta_b_2
+                sigma_out = y_out - y_train[idx]
+                delta_w_2 = np.dot(z_out.T, sigma_out)
+                delta_b_2 = np.sum(sigma_out, axis=0)
+                self.w_2 -= self.eta * delta_w_2
+                # self.b_2 -= self.eta * delta_b_2
 
-                sigma_2 = np.dot(sigma_1, self.w_2.T) * self._tanh_derivate(z_in)
-                delta_w_1 = np.dot(sigma_2, X_train[idx])
-                delta_b_1 = np.sum(sigma_2, axis=0)
-                self.w_1 += self.eta * delta_w_1
-                self.b_1 += self.eta * delta_b_1
+                sigma_h = np.dot(sigma_out, self.w_2.T) * self._tanh_derivate(z_in)
+                delta_w_1 = np.dot(sigma_h, X_train[idx])
+                delta_b_1 = np.sum(sigma_h, axis=0)
+                self.w_1 -= self.eta * delta_w_1
+                # self.b_1 -= self.eta * delta_b_1
 
-                print("w_1", self.w_1)
-                print("w_2", self.w_2)
+                # print("w_1", self.w_1)
+                # print("w_2", self.w_2)
         return self
     
     def predict(self, X):
-        _, _, _, y_out = self._forward(X)
-        y_pred = np.argmax(y_out, axis=1)
+        y_pred = np.array([])
+        print(X.shape)
+        for i in range(X.shape[0]):
+            _, _, _, y_out = self._forward(X[i])
+            y_pred = np.append(y_pred, y_out)
 
         return y_pred
 
 def util_mlp():
-    N = 1000
+    N = 500
     train = make_sin_data(N)
     test = make_sin_data(N)
-    mlp = MultilayerPerceptron(epochs=1, eta=0.5)
+    mlp = MultilayerPerceptron(n_hidden=150, epochs=1, eta=0.05)
     mlp.fit(train.index, train.values)
     valid_y = mlp.predict(np.array([test.index]).T)
     valid = pd.Series(valid_y, index=test.index)
+    print(valid)
 
     train_ax = plt.subplot(1,2,1)
     valid_ax = plt.subplot(1,2,2)
