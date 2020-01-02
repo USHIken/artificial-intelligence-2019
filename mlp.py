@@ -93,7 +93,7 @@ def util_mlp():
     test = make_sin_data(N)
     mlp = MultilayerPerceptron(n_hidden=150, epochs=1, eta=0.05)
     mlp.fit(train.index, train.values)
-    valid_y = mlp.predict(np.array([test.index]).T)
+    valid_y = mlp.predict(test.index)
     valid = pd.Series(valid_y, index=test.index)
     print(valid)
 

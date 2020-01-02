@@ -1,1 +1,1 @@
-# pattern-recognition-2019
+# artificial-intelligence-2019
