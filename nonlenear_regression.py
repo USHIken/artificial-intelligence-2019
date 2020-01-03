@@ -101,16 +101,15 @@ def nonlenear_regression(data, basis_func, param, regularizer_lambda=0, plot=Non
 
 if __name__ == "__main__":
 
-    N = 100
+    plt.figure()
 
-    # nonlenear regression
+    N = 50
 
     # setup some data
-    NOISE = {"loc":0.0, "scale":0.1}
+    NOISE = {"loc":0.0, "scale":0.3}
     POLY_PARAM_NUM = 10
-    RBF_PARAM_NUM = 4
+    RBF_PARAM_NUM = 25
 
-    plt.figure()
     # 多項式, RBF
     poly_ax = plt.subplot(2, 2, 1)
     poly_reg_ax = plt.subplot(2, 2, 2)
@@ -119,9 +118,9 @@ if __name__ == "__main__":
     axes = [poly_ax, poly_reg_ax, rbf_ax, rbf_reg_ax]
 
     # 多項式のみ
-    # poly_ax = plt.subplot(1, 2, 1)
-    # poly_reg_ax = plt.subplot(1, 2, 2)
-    # axes = [poly_ax, poly_reg_ax]
+    poly_ax = plt.subplot(1, 2, 1)
+    poly_reg_ax = plt.subplot(1, 2, 2)
+    axes = [poly_ax, poly_reg_ax]
 
     # RBFのみ
     rbf_ax = plt.subplot(1, 2, 1)
@@ -135,20 +134,21 @@ if __name__ == "__main__":
     # # polynomial without regularization
     # # fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, 0, plot=poly_ax)
     # fitted_by_poly = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, plot=False)
-    # plot_data(fitted_by_poly, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_ax)
+    # plot_data(fitted_by_poly, 'poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_ax)
     # # polynomial without regularization
     # # fitted_by_poly_reg = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=poly_reg_ax)
     # fitted_by_poly_reg = nonlenear_regression(noise_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=False)
-    # plot_data(fitted_by_poly_reg, 'fitted by poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_reg_ax)
+    # plot_data(fitted_by_poly_reg, 'poly with regularizer(M={})'.format(POLY_PARAM_NUM), 'r-', poly_reg_ax)
 
     # rbf without regularization
-    # fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, 0, plot=rbf_ax)
-    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
-    plot_data(fitted_by_rbf, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_ax)
+    fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=rbf_ax)
+    # fitted_by_rbf = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
+    plot_data(fitted_by_rbf, 'rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_ax)
     # rbf without regularization
-    # fitted_by_rbf_reg = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=rbf_reg_ax)
-    fitted_by_rbf_reg = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
-    plot_data(fitted_by_rbf_reg, 'fitted by rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_reg_ax)
+    fitted_by_rbf_reg = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=rbf_reg_ax)
+    fitted_by_rbf_reg = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda=0.1, plot=rbf_reg_ax)
+    # fitted_by_rbf_reg = nonlenear_regression(noise_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
+    plot_data(fitted_by_rbf_reg, 'rbf with regularizer(M={})'.format(RBF_PARAM_NUM), 'b-', rbf_reg_ax)
 
     # plotting noisy data
     for ax in axes:

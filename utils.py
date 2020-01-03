@@ -78,6 +78,9 @@ def make_data(n, func, start, end, noise):
         data = noise_func(data, n)
     return data
 
+def get_relative_error(actual, measured, percent=True):
+    e = abs(actual - measured)/actual
+    return e*100 if percent else e
 
 def plot_data(data, name, style=None, axes=None):
     df = pd.DataFrame({name: data})
