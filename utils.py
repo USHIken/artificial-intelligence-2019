@@ -28,7 +28,7 @@ def make_linear_data(n, a=1, b=0, noise={"loc":0.0, "scale":0.1}):
     return data
 
 
-def make_sin_data(n, noise={"loc":0.0, "scale":0.1}):
+def make_sin_data(n, noise={"loc":0.0, "scale":0.1}, width=1):
     """
     sinデータを返す
 
@@ -45,7 +45,7 @@ def make_sin_data(n, noise={"loc":0.0, "scale":0.1}):
         sinデータ
     """
     func = np.sin
-    data = make_data(n, func, -1*np.pi, 1*np.pi, noise)
+    data = make_data(n*width, func, -width*np.pi, width*np.pi, noise)
     return data
 
 
@@ -84,4 +84,4 @@ def get_relative_error(actual, measured, percent=True):
 
 def plot_data(data, name, style=None, axes=None):
     df = pd.DataFrame({name: data})
-    df.plot.line(style=style, ax=axes)
+    df.plot.line(style=style, ax=axes, markersize=3)
