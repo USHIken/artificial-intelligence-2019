@@ -104,60 +104,124 @@ def nonlenear_regression(train_data, test_data, basis_func, param, regularizer_l
     return data
 
 
-if __name__ == "__main__":
+def get_axes(spec):
+    poly_ax = None
+    poly_reg_ax = None
+    rbf_ax = None
+    rbf_reg_ax = None
+
+    if spec == "both":      # 多項式, RBF        
+        poly_ax = plt.subplot(2, 2, 1)
+        poly_reg_ax = plt.subplot(2, 2, 2)
+        rbf_ax = plt.subplot(2, 2, 3)
+        rbf_reg_ax = plt.subplot(2, 2, 4)
+
+    elif spec == "poly":    # 多項式のみ
+        poly_ax = plt.subplot(1, 2, 1)
+        poly_reg_ax = plt.subplot(1, 2, 2)
+
+    elif spec == "rbf":     # RBFのみ        
+        rbf_ax = plt.subplot(1, 2, 1)
+        rbf_reg_ax = plt.subplot(1, 2, 2)
+    
+    return poly_ax, poly_reg_ax, rbf_ax, rbf_reg_ax
+
+def regularizing_exp():
+
+    plt.figure()
+    ax = plt.subplot(1,1,1)
+
+    NOISE = {"loc":0.0, "scale":0.3}
+    train_N = 100
+    test_N = 1000
+    noise_data = make_sin_data(train_N, noise=NOISE)
+    test_data = make_sin_data(test_N, noise=False, width=1)
+    regularizer_lambda = 1
+    RBF_PARAM_NUMs = [3, 5, 10, 20, 30, 50]
+    axes = [plt.subplot(2,3,i+1) for i in range(len(RBF_PARAM_NUMs))]
+    alphs = list("abcdef")
+
+    for RBF_PARAM_NUM, ax, alph in zip(RBF_PARAM_NUMs, axes, alphs):
+        plt.axes(ax)
+        # rbf without regularization
+        fitted_by_rbf = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
+        plot_data(fitted_by_rbf, 'without regularizer', 'r:', ax)
+        # rbf with regularization
+        fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
+        plot_data(fitted_by_rbf_reg, 'with regularizer', 'r-', ax)
+
+        plot_data(test_data, 'test data', 'b--', ax)
+        plot_data(noise_data, 'noise data', 'g.', ax)
+        plt.title("({}) n={}".format(alph, RBF_PARAM_NUM))
+    
+    plt.show()
+
+
+def plotting_exp(spec):
 
     plt.figure()
 
-    train_N = 50
+    poly, rbf = False, False
+    if spec == "both":
+        poly, rbf = True, True
+    elif spec == "poly":
+        poly = True
+    elif spec == "rbf":
+        rbf = True
+    axes = get_axes(spec)
+    poly_ax, poly_reg_ax, rbf_ax, rbf_reg_ax = axes
+
+    train_N = 100
     test_N = 10000
 
     # setup some data
-    NOISE = {"loc":0.0, "scale":0.3}
+    NOISE = {"loc":0.0, "scale":0.1}
     POLY_PARAM_NUM = 10
-    RBF_PARAM_NUM = 25
-
-    # 多項式, RBF
-    poly_ax = plt.subplot(2, 2, 1)
-    poly_reg_ax = plt.subplot(2, 2, 2)
-    rbf_ax = plt.subplot(2, 2, 3)
-    rbf_reg_ax = plt.subplot(2, 2, 4)
-    axes = [poly_ax, poly_reg_ax, rbf_ax, rbf_reg_ax]
-
-    # 多項式のみ
-    poly_ax = plt.subplot(1, 2, 1)
-    poly_reg_ax = plt.subplot(1, 2, 2)
-    axes = [poly_ax, poly_reg_ax]
-
-    # RBFのみ
-    rbf_ax = plt.subplot(1, 2, 1)
-    rbf_reg_ax = plt.subplot(1, 2, 2)
-    axes = [rbf_ax, rbf_reg_ax]
+    RBF_PARAM_NUM = 30
 
     noise_data = make_sin_data(train_N, noise=NOISE)
-    test_data = make_sin_data(test_N, noise=False)
+    test_data = make_sin_data(test_N, noise=False, width=1)
     # regularizer_lambda = np.exp(-18)
-    regularizer_lambda = 0.1
+    regularizer_lambda = 1
 
-    # # polynomial without regularization
-    # # fitted_by_poly = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, 0, plot=poly_ax)
-    # fitted_by_poly = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, plot=False)
-    # plot_data(fitted_by_poly, 'poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_ax)
-    # # polynomial without regularization
-    # # fitted_by_poly_reg = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=poly_reg_ax)
-    # fitted_by_poly_reg = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=False)
-    # plot_data(fitted_by_poly_reg, 'poly with regularizer(M={})'.format(POLY_PARAM_NUM), 'r-', poly_reg_ax)
+    if poly:
+        # polynomial without regularization
+        fitted_by_poly = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, 0, plot=poly_ax)
+        # fitted_by_poly = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, plot=False)
+        plot_data(fitted_by_poly, 'poly (M={})'.format(POLY_PARAM_NUM), 'r-', poly_ax)
+        # polynomial with regularization
+        fitted_by_poly_reg = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=poly_reg_ax)
+        # fitted_by_poly_reg = nonlenear_regression(noise_data, test_data, polynomial_basis_func, POLY_PARAM_NUM, regularizer_lambda, plot=False)
+        plot_data(fitted_by_poly_reg, 'poly with regularizer(M={})'.format(POLY_PARAM_NUM), 'r-', poly_reg_ax)
 
-    # rbf without regularization
-    fitted_by_rbf = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, plot=rbf_ax)
-    # fitted_by_rbf = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
-    plot_data(fitted_by_rbf, 'rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_ax)
-    # rbf without regularization
-    fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=rbf_reg_ax)
-    fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda=0.1, plot=rbf_reg_ax)
-    # fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
-    plot_data(fitted_by_rbf_reg, 'rbf with regularizer(M={})'.format(RBF_PARAM_NUM), 'b-', rbf_reg_ax)
+    if rbf:
+        # rbf without regularization
+        fitted_by_rbf = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, plot=rbf_ax)
+        # fitted_by_rbf = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, plot=False)
+        plot_data(fitted_by_rbf, 'rbf (M={})'.format(RBF_PARAM_NUM), 'b-', rbf_ax)
+        # rbf with regularization
+        fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=rbf_reg_ax)
+        # fitted_by_rbf_reg = nonlenear_regression(noise_data, test_data, radial_basis_func, RBF_PARAM_NUM, regularizer_lambda, plot=False)
+        plot_data(fitted_by_rbf_reg, 'rbf with regularizer(M={})'.format(RBF_PARAM_NUM), 'b-', rbf_reg_ax)
 
     # plotting noisy data
     for ax in axes:
-        plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', ax)
+        if ax:
+            plt.axes(ax)
+            plt.ylim(-2, 2)
+            plot_data(test_data, 'test data'.format(NOISE["loc"], NOISE["scale"]), 'b--', ax)
+            plot_data(noise_data, 'noise (loc={}, scale={})'.format(NOISE["loc"], NOISE["scale"]), 'g.', ax)
     plt.show()
+
+def plotting_sin(width):
+    x = np.linspace(-width*np.pi, width*np.pi, 201)
+    plt.plot(x, np.sin(x))
+    plt.xlabel('Angle [rad]')
+    plt.ylabel('sin(x)')
+    plt.axis('tight')
+    plt.show()
+
+if __name__ == "__main__":
+    # plotting_exp("rbf")
+    regularizing_exp()
+    # plotting_sin(2)
